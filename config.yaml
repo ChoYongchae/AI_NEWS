@@ -1,0 +1,18 @@
+# Topics to search for papers
+topics:
+  - "Large Language Models"
+  - "Agentic AI"
+  - "Vision Language Models"
+  - "Reinforcement Learning"
+
+# Agent Personality
+agent:
+  name: "Daily AI Paper Agent"
+  role: "Research Assistant"
+  language: "Korean"  # Summary language
+  tone: "Professional yet engaging"
+
+# Filters
+filters:
+  days_back: 1
+  max_papers_per_source: 5

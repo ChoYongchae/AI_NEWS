@@ -42,7 +42,11 @@ class HuggingFaceCollector:
             max_papers = self.config.get('filters', {}).get('max_papers_per_source', 10)
             target_ids = list(arxiv_ids)[:max_papers]
             
-            return self._fetch_arxiv_details(target_ids)
+            papers = self._fetch_arxiv_details(target_ids)
+            
+            logger.info(f"HuggingFace: Found {len(papers)} trending papers.")
+            
+            return papers
 
         except Exception as e:
             logger.error(f"Error collecting from HF: {e}")

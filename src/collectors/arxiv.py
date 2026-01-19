@@ -31,6 +31,7 @@ class ArxivCollector:
             try:
                 feed = feedparser.parse(url)
                 
+                found_for_topic = 0
                 for entry in feed.entries:
                     published = datetime.strptime(entry.published, '%Y-%m-%dT%H:%M:%SZ')
                     days_back = self.config.get('filters', {}).get('days_back', 1)
@@ -44,6 +45,9 @@ class ArxivCollector:
                             'published': entry.published
                         }
                         papers.append(paper)
+                        found_for_topic += 1
+                
+                logger.info(f"ArXiv: Found {found_for_topic} papers for topic '{topic}' (Total raw: {len(feed.entries)})")
                         
             except Exception as e:
                 logger.error(f"Error fetching from ArXiv for topic {topic}: {e}")

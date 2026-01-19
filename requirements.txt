@@ -6,3 +6,4 @@ pyyaml
 python-dotenv
 tenacity
 markdown
+google-genai

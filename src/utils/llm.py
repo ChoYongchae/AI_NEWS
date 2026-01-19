@@ -4,6 +4,12 @@ from typing import List, Dict
 import openai
 from tenacity import retry, stop_after_attempt, wait_exponential
 
+try:
+    from google import genai
+    from google.genai import types
+except ImportError:
+    genai = None
+
 logger = logging.getLogger(__name__)
 
 class LLMUtil:
@@ -13,8 +19,14 @@ class LLMUtil:
         self.api_key = os.getenv("LLM_API_KEY")
         self.model = os.getenv("LLM_MODEL", "gpt-4o")
 
-        if self.provider == "openai" and self.api_key:
-            openai.api_key = self.api_key
+        if self.api_key:
+            if self.provider == "openai":
+                openai.api_key = self.api_key
+            elif self.provider == "gemini":
+                if not genai:
+                    logger.error("google-genai package not found. Please install it.")
+                else:
+                    self.gemini_client = genai.Client(api_key=self.api_key)
         else:
             logger.warning("LLM API Key not found. LLM features may not work.")
 
@@ -58,14 +70,23 @@ class LLMUtil:
         """
 
         try:
-            response = openai.chat.completions.create(
-                model=self.model,
-                messages=[
-                    {"role": "system", "content": "You are a helpful AI research assistant."},
-                    {"role": "user", "content": prompt}
-                ]
-            )
-            return response.choices[0].message.content
+            if self.provider == "openai":
+                response = openai.chat.completions.create(
+                    model=self.model,
+                    messages=[
+                        {"role": "system", "content": "You are a helpful AI research assistant."},
+                        {"role": "user", "content": prompt}
+                    ]
+                )
+                return response.choices[0].message.content
+            
+            elif self.provider == "gemini" and genai:
+                response = self.gemini_client.models.generate_content(
+                    model=self.model,
+                    contents=prompt
+                )
+                return response.text
+
         except Exception as e:
             logger.error(f"LLM generation failed: {e}")
             return self._fallback_format(papers)

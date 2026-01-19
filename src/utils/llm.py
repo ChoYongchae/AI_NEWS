@@ -47,12 +47,22 @@ class LLMUtil:
         for i, p in enumerate(papers, 1):
             papers_text += f"{i}. Title: {p['title']}\n   Source: {p['source']}\n   Abstract: {p['abstract'][:500]}...\n   Link: {p['link']}\n\n"
 
+        focus_instruction = ""
+        if self.config.get('agent', {}).get('focus_on_topics', False):
+            topics = self.config.get('topics', [])
+            if topics:
+                focus_instruction = f"""
+        Important: The user is specifically interested in: {', '.join(topics)}.
+        
+        Please prioritize papers related to these topics in your summary. You may group them together or highlight them to ensure they are noticed first.
+        """
+
         prompt = f"""
         You are a research assistant writing a "Morning News" style daily digest of AI papers.
         The audience consists of AI researchers and engineers.
         
         Language: {language}
-        Tone: {tone}
+        Tone: {tone}{focus_instruction}
         
         Task:
         1. Select the most impactful/interesting papers from the list below.

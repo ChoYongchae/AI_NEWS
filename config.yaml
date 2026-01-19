@@ -11,6 +11,7 @@ agent:
   role: "Research Assistant"
   language: "Korean"  # Summary language
   tone: "Professional yet engaging"
+  focus_on_topics: true # [true, false], Prioritize configured topics in summary
 
 # Filters
 filters:
